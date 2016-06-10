@@ -2,22 +2,18 @@
 #define _LOGGERS_HPP
 
 #include <string>
+#include <fstream>
 
 //LogAdapter is an interface for writing strings
 class LogAdapter {
-public: 
-	LogAdapter();
-	
+public: 	
 	virtual void write(const std::string& data) = 0;
 };
 
 //Console implementation of a LogAdapter
 class ConsoleLogAdapter : public LogAdapter {
 public:
-	ConsoleLogAdapter();
-
 	void write(const std::string &data) override;
-
 };
 
 //File implementation of a LogAdapter, write string of stream to file
@@ -28,6 +24,7 @@ public:
 	void write(const std::string& data) override;
 
 private:
+	std::fstream fs;
 	std::string filename;
 };
 
@@ -35,10 +32,8 @@ private:
 //A logger always uses a LogAdapter to write it's data.
 class Logger {
 public: 
-	Logger(const LogAdapter &logAdapter);
-
-private:
-	LogAdapter logAdapter;
+	Logger(LogAdapter &logAdapter);
+	LogAdapter & logAdapter;
 };
 
 // Debug implementation of a Logger. Handles formatting user debug log. 
@@ -52,17 +47,19 @@ public:
 		ERROR
 	};
 
-	DebugLogger(const LogAdapter& logAdapter);
+	DebugLogger(LogAdapter& logAdapter);
 
-	void Log(const Clock::TimeStamp &time, const LOG_TYPE &type, const std::string& massage);
+	void log(const std::string& time, const LOG_TYPE &type, const std::string& massage); // const std::string& time => const Clock::TimeStamp& time 
+
+private:
+	inline const char* ToString(LOG_TYPE t);
 };
-
+/*
 //Telemetry implementation of a Logger. Gather data and write it to the adapter. 
 class TelemetryLogger : Logger {
 	TelemetryLogger(const LogAdapter&, const SharedObject<RobotStatus>&, const SharedObject<Map>&);
 
-	void Log();
+	void log();
 };
-
-#endif _LOGGERS_HPP 
-
+*/
+#endif
