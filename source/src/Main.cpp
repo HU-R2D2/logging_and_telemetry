@@ -1,4 +1,5 @@
 #include "../include/Loggers.hpp"
+
 #include <string>
 
 int main() {
@@ -8,7 +9,7 @@ int main() {
 	fla.write("Hello World! Test Test");
 
 	DebugLogger dl(fla);
-	dl.log("12:23", DebugLogger::LOG_TYPE::INFO, "dit is een mooie test");
+	dl.log(DebugLogger::LOG_TYPE::INFO, "dit is een mooie test");
 
 	while(true);
 }
