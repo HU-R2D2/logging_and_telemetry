@@ -40,6 +40,8 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <ctime>
+#include <thread>
 using namespace std;
 void LogAdapter::write(const std::string& data) {}
 
@@ -81,25 +83,33 @@ void DebugLogger::log(const LOG_TYPE &type, const std::string& massage) {
 	std::time_t tt;
 
 	tt = std::chrono::system_clock::to_time_t ( today );
-	string time = ctime(&tt);
-	time.erase(std::remove(time.begin(), time.end(), '\n'), time.end());
-	logAdapter.write("[" + time + "] " + "[" + ToString(type) + "] " + ": " + massage);
+	char time[26];
+	ctime_s(time, sizeof time, &tt);
+	string strTime(time);
+	//time.erase(std::remove(time.begin(), time.end(), '\n'), time.end());
+	logAdapter.write("[" + strTime + "] " + "[" + ToString(type) + "] " + ": " + massage);
 }
 
-TelemetryLogger::TelemetryLogger(const LogAdapter&, const SharedObject<RobotStatus>&, const SharedObject<Map>&):
-	logger(logAdapter)
+TelemetryLogger::TelemetryLogger(LogAdapter& logAdapter, const std::string r, const std::string m):
+	r(r),
+	m(m),
+	Logger(logAdapter)
 {}
 
-void TelemetryLogger::TelemetryLoggerTask(const TelemetryLogger&)
-{
-	TelemetryLogger.LogAdapter.write();
-	thread log(log);
-	
-}
-
 void TelemetryLogger::Log() {
-	
+	std::chrono::system_clock::time_point today = std::chrono::system_clock::now();
 
+	std::time_t tt;
+
+	tt = std::chrono::system_clock::to_time_t(today);
+	char time[26];
+	ctime_s(time, sizeof time, &tt);
+	string strTime(time);
+	logAdapter.write("[" + strTime + "]" + "Robotstatus: " + r + "Map: " + m);
+
+	//std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
-
+TelemetryLoggerTask::TelemetryLoggerTask(TelemetryLogger&){
+	//std::thread task(&TelemetryLogger::Log);
+}
