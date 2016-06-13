@@ -85,12 +85,21 @@ void DebugLogger::log(const LOG_TYPE &type, const std::string& massage) {
 	time.erase(std::remove(time.begin(), time.end(), '\n'), time.end());
 	logAdapter.write("[" + time + "] " + "[" + ToString(type) + "] " + ": " + massage);
 }
-/*
+
 TelemetryLogger::TelemetryLogger(const LogAdapter&, const SharedObject<RobotStatus>&, const SharedObject<Map>&):
+	logger(logAdapter)
 {}
 
+void TelemetryLogger::TelemetryLoggerTask(const TelemetryLogger&)
+{
+	TelemetryLogger.LogAdapter.write();
+	thread log(log);
+	
+}
+
 void TelemetryLogger::Log() {
+	
 
 }
 
-*/
+

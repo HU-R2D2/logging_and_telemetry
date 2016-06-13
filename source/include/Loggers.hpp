@@ -42,7 +42,7 @@
 #include <algorithm>
 #include <string>
 #include <fstream>
-
+#include "RobotStatus.hpp"
 //LogAdapter is an interface for writing strings
 class LogAdapter {
 public: 	
@@ -93,12 +93,12 @@ public:
 private:
 	inline const char* ToString(LOG_TYPE t);
 };
-/*
+
 //Telemetry implementation of a Logger. Gather data and write it to the adapter. 
 class TelemetryLogger : Logger {
 	TelemetryLogger(const LogAdapter&, const SharedObject<RobotStatus>&, const SharedObject<Map>&);
 
 	void log();
 };
-*/
+
 #endif
