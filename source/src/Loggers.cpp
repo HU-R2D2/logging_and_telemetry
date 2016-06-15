@@ -48,8 +48,10 @@ using namespace std;
 void LogAdapter::write(const std::string& data) {}
 
 void ConsoleLogAdapter::write(const std::string &data) {
+	//write the string to the console
 	std::cout << data << std::endl;
 }
+
 
 FileLogAdapter::FileLogAdapter(const std::string &filename) :
 	filename(filename)
@@ -59,6 +61,7 @@ FileLogAdapter::FileLogAdapter(const std::string &filename) :
 }
 
 void FileLogAdapter::write(const std::string& data) {
+	//write the string to the file
 	fs << data << std::endl;
 }
 
@@ -70,6 +73,7 @@ DebugLogger::DebugLogger(LogAdapter& logAdapter):
 	Logger(logAdapter)
 {}
 
+//to change log_type to string
 inline const char* DebugLogger::ToString(LOG_TYPE t) {
 	switch (t) {
 		case LOG_TYPE::VERBOSE: return "VERBOSE";
@@ -80,13 +84,18 @@ inline const char* DebugLogger::ToString(LOG_TYPE t) {
 	}
 }
 
+//log function to say what kind of log_type it is and the string you want to print
 void DebugLogger::log(const LOG_TYPE &type, const std::string& massage) {
-	std::chrono::system_clock::time_point today = std::chrono::system_clock::now();
 
+	std::chrono::system_clock::time_point today = std::chrono::system_clock::now();
 	std::time_t tt;
+	//change time type to be able to change it to a string
 	tt = std::chrono::system_clock::to_time_t ( today );
+	//time to string
 	string time = ctime(&tt);
+	//remove the endline character from the time string
 	time.erase(std::remove(time.begin(), time.end(), '\n'), time.end());
+	//let the logadapter write the whole string
 	logAdapter.write("[" + time + "] " + "[" + ToString(type) + "] " + ": " + massage);
 }
 
@@ -96,7 +105,10 @@ TelemetryLogger::TelemetryLogger(LogAdapter& logAdapter, const std::string r, co
 	Logger(logAdapter)
 {}
 
+
+//not functional yet
 void* TelemetryLogger::Log(void*) {
+	
 	std::chrono::system_clock::time_point today = std::chrono::system_clock::now();
 
 	std::time_t tt;	
@@ -114,11 +126,10 @@ void* TelemetryLogger::Log(void*) {
 	fs.close();
 	
 	
-	
-	
+	//////everything under here, doesn't function yet, the architect is looking into it//////
 	
 	//std::this_thread::sleep_for(std::chrono::seconds(1));
-	//alles hieronder werkt nog niet
+	
 	/*
 	int milisec = 1000; // length of time to sleep, in miliseconds
 	struct timespec req = {0};
@@ -130,7 +141,6 @@ void* TelemetryLogger::Log(void*) {
 
 TelemetryLoggerTask::TelemetryLoggerTask(TelemetryLogger&){
 	//std::thread task(&TelemetryLogger::Log);
-	//alles hieronder werkt nog niet
 	//pthread_t t1;
 	//pthread_create(&t1, NULL, &TelemetryLogger::Log, nullptr);
 }
