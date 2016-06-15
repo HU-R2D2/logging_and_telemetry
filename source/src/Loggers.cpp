@@ -41,7 +41,9 @@
 #include <fstream>
 #include <iostream>
 #include <ctime>
-#include <thread>
+#include <pthread.h>
+#include <time.h>
+#include <BoxMap.hpp>
 using namespace std;
 void LogAdapter::write(const std::string& data) {}
 
@@ -53,6 +55,7 @@ FileLogAdapter::FileLogAdapter(const std::string &filename) :
 	filename(filename)
 {
 	fs.open(filename, std::fstream::in | std::fstream::out | std::fstream::app);
+	
 }
 
 void FileLogAdapter::write(const std::string& data) {
@@ -81,13 +84,13 @@ void DebugLogger::log(const LOG_TYPE &type, const std::string& massage) {
 	std::chrono::system_clock::time_point today = std::chrono::system_clock::now();
 
 	std::time_t tt;
-
+	string time = ctime(&tt);
 	tt = std::chrono::system_clock::to_time_t ( today );
-	char time[26];
-	ctime_s(time, sizeof time, &tt);
-	string strTime(time);
-	//time.erase(std::remove(time.begin(), time.end(), '\n'), time.end());
-	logAdapter.write("[" + strTime + "] " + "[" + ToString(type) + "] " + ": " + massage);
+	//char time[26];
+	//ctime_s(time, sizeof(time), &tt);
+	//string strTime(time);
+	time.erase(std::remove(time.begin(), time.end(), '\n'), time.end());
+	logAdapter.write("[" + time + "] " + "[" + ToString(type) + "] " + ": " + massage);
 }
 
 TelemetryLogger::TelemetryLogger(LogAdapter& logAdapter, const std::string r, const std::string m):
@@ -96,20 +99,44 @@ TelemetryLogger::TelemetryLogger(LogAdapter& logAdapter, const std::string r, co
 	Logger(logAdapter)
 {}
 
-void TelemetryLogger::Log() {
+void* TelemetryLogger::Log(void*) {
 	std::chrono::system_clock::time_point today = std::chrono::system_clock::now();
 
 	std::time_t tt;
-
+	string time = ctime(&tt);
 	tt = std::chrono::system_clock::to_time_t(today);
-	char time[26];
-	ctime_s(time, sizeof time, &tt);
-	string strTime(time);
-	logAdapter.write("[" + strTime + "]" + "Robotstatus: " + r + "Map: " + m);
+	//char time[26];
+	//ctime_s(time, sizeof time, &tt);
+	//string strTime(time);
+	time.erase(std::remove(time.begin(), time.end(), '\n'), time.end());
+	logAdapter.write("[" + time + "]" + "Robotstatus: " + r + "Map: " + m);
 
+	
+	//map
+	string mapFileName = time + " map.log";
+	fs.open(mapFileName, std::fstream::in | std::fstream::out | std::fstream::app);
+	//r2d2::BoxMap bm{};
+    //bm.save(mapFileName);
+	fs.close();
+	
+	
+	
+	
+	
 	//std::this_thread::sleep_for(std::chrono::seconds(1));
+	//alles hieronder werkt nog niet
+	/*
+	int milisec = 1000; // length of time to sleep, in miliseconds
+	struct timespec req = {0};
+	req.tv_sec = 0;
+	req.tv_nsec = milisec * 1000000L;
+	nanosleep(&req, (struct timespec *)NULL);
+	*/
 }
 
 TelemetryLoggerTask::TelemetryLoggerTask(TelemetryLogger&){
 	//std::thread task(&TelemetryLogger::Log);
+	//alles hieronder werkt nog niet
+	//pthread_t t1;
+	//pthread_create(&t1, NULL, &TelemetryLogger::Log, nullptr);
 }

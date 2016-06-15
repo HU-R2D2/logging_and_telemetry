@@ -99,9 +99,10 @@ class TelemetryLogger : Logger {
 public: 	
 	TelemetryLogger(LogAdapter& logAdapter, const std::string r, const std::string m);
 
-	void Log();
+	void* Log(void*);
 
 private: 
+	std::fstream fs;
 	const std::string r;
 	const std::string m;
 };
