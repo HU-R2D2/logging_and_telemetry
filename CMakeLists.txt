@@ -16,7 +16,7 @@ file(GLOB SOURCES "source/src/*.cpp"
 		"../adt/source/src/Coordinate.cpp"
 		"../adt/source/src/Translation.cpp")
 file(GLOB SOURCES_GTEST "source/src/*.cpp" "source/include/*.hpp" "test/*.cpp" "test/*.hpp")
-list(REMOVE_ITEM SOURCES_GTEST ${CMAKE_CURRENT_SOURCE_DIR}/source/src/<main.cpp>)
+list(REMOVE_ITEM SOURCES_GTEST ${CMAKE_CURRENT_SOURCE_DIR}/source/src/Main.cpp)
 
 include_directories(
 	../map/source/include
