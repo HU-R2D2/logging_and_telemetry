@@ -10,17 +10,36 @@ file(GLOB SOURCES "source/src/*.cpp"
 		"source/include/*.hpp"
 		"../map/source/src/MapInterface.cpp" 
 		"../map/source/include/MapInterface.hpp"
+		"../map/source/include/ArrayBoxMap.hpp"
+		"../map/source/src/ArrayBoxMap.cpp"
+		"../map/source/include/BoxMap.hpp"
+		"../map/source/src/BoxMap.cpp"
+		"../sharedobjects/source/include/SharedObject.cpp"
 		"../adt/source/include/ADT_Base.hpp"
 		"../adt/source/src/Length.cpp"
 		"../adt/source/src/Box.cpp"
 		"../adt/source/src/Coordinate.cpp"
 		"../adt/source/src/Translation.cpp")
-file(GLOB SOURCES_GTEST "source/src/*.cpp" "source/include/*.hpp" "test/*.cpp" "test/*.hpp")
+file(GLOB SOURCES_GTEST "source/src/*.cpp" "source/include/*.hpp" "test/*.cpp" "test/*.hpp"
+"../map/source/src/MapInterface.cpp" 
+		"../map/source/include/MapInterface.hpp"
+		"../map/source/include/ArrayBoxMap.hpp"
+		"../map/source/src/ArrayBoxMap.cpp"
+		"../map/source/include/BoxMap.hpp"
+		"../map/source/src/BoxMap.cpp"
+		"../sharedobjects/source/include/SharedObject.cpp"
+		"../adt/source/include/ADT_Base.hpp"
+		"../adt/source/src/Length.cpp"
+		"../adt/source/src/Box.cpp"
+		"../adt/source/src/Coordinate.cpp"
+		"../adt/source/src/Translation.cpp")
 list(REMOVE_ITEM SOURCES_GTEST ${CMAKE_CURRENT_SOURCE_DIR}/source/src/Main.cpp)
 
 include_directories(
+	../pilot/source/include
 	../map/source/include
    	../adt/source/include
+	../sharedobjects/source/include
   	../deps/gtest-1.7.0/include
   	../deps/gtest-1.7.0)
 

@@ -42,6 +42,9 @@
 #include <algorithm>
 #include <string>
 #include <fstream>
+#include <BoxMap.hpp>
+#include <DefaultBoxMap.hpp>
+#include <LockingSharedObject.hpp>
 
 //LogAdapter is an interface for writing strings
 class LogAdapter {
@@ -88,7 +91,7 @@ public:
 
 	DebugLogger(LogAdapter& logAdapter);
 
-	void log(const LOG_TYPE &type, const std::string& massage);
+	void log(const LOG_TYPE &type, const std::string& message);
 
 private:
 	inline const char* ToString(LOG_TYPE t);
@@ -97,20 +100,24 @@ private:
 //Telemetry implementation of a Logger. Gather data and write it to the adapter. 
 class TelemetryLogger : Logger {
 public: 	
-	TelemetryLogger(LogAdapter& logAdapter, const std::string r, const std::string m);
-
-	void* Log(void*);
-
+	TelemetryLogger(LogAdapter& logAdapter, const std::string r, SharedObject<r2d2::SaveLoadMap>& map);
+	void start();
+	void stop();
+	bool isRunning();
+	
+protected:
+	void Log();
+	static void* RUN(void* p);
 private: 
+
+	std::string name = "one";
+	pthread_t threadId;
+	bool running;
+	SharedObject<r2d2::SaveLoadMap>& map;
 	std::fstream fs;
 	const std::string r;
-	const std::string m;
+	
 };
 
-class TelemetryLoggerTask {
-public: 
-	TelemetryLoggerTask(TelemetryLogger& telemetryLogger);
-
-};
 
 #endif

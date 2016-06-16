@@ -1,8 +1,49 @@
 #include "../../deps/gtest-1.7.0/include/gtest/gtest.h"
 #include "../source/include/Loggers.hpp"
+
 #include <iostream>
 #include <fstream>
 #include <string>
+
+#define MAP_TEST_SIZE 100
+ r2d2::DefaultBoxMap box(){
+	r2d2::DefaultBoxMap bm{};
+
+
+	for (int y = 0; y < MAP_TEST_SIZE; ++y) {
+		for (int x = 0; x < MAP_TEST_SIZE; ++x) {
+			r2d2::Coordinate new_pos{
+					x * r2d2::Length::METER,
+					y * r2d2::Length::METER,
+					-1 * r2d2::Length::METER
+			};
+
+			r2d2::BoxInfo info{
+					rand() % 2 == 0,
+					rand() % 2 == 0,
+					rand() % 2 == 0};
+
+			bm.set_box_info(
+					r2d2::Box{
+							new_pos,
+							new_pos
+							+ r2d2::Translation{
+									2 * r2d2::Length::METER,
+									2 * r2d2::Length::METER,
+									2 * r2d2::Length::METER
+							}
+					},
+					info.get_has_obstacle() || info.get_has_navigatable() ? info : r2d2::BoxInfo{
+							(x ^ y) % 2 == 0,
+							(x ^ y) % 2 == 1,
+							info.get_has_unknown()
+					}
+			);
+		}
+	}
+	return bm;
+
+}
 
 TEST(LoggerTest, FileWriteTest) {
 	std::string file = "FileWriteTest.txt";
@@ -71,8 +112,11 @@ TEST(LoggerTest, TelemetryLoggerTest) {
 	std::string m1 = "mooi";
 	std::string m2 = "cool";
 	FileLogAdapter fla(file);
-	TelemetryLogger tl(fla, m1, m2);
-	TelemetryLoggerTask tlt(tl);
+	
+	r2d2::DefaultBoxMap bm{box()};
+	LockingSharedObject<r2d2::SaveLoadMap> ding(bm);
+	
+	TelemetryLogger tl(fla, m1, ding);
 	
 }
 

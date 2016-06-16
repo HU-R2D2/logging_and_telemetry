@@ -36,7 +36,7 @@
 // OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ++--++
 #include "../include/Loggers.hpp"
-
+#include <thread>
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -44,6 +44,7 @@
 #include <pthread.h>
 #include <time.h>
 #include <BoxMap.hpp>
+#include <SharedObject.hpp>
 using namespace std;
 void LogAdapter::write(const std::string& data) {}
 
@@ -85,7 +86,7 @@ inline const char* DebugLogger::ToString(LOG_TYPE t) {
 }
 
 //log function to say what kind of log_type it is and the string you want to print
-void DebugLogger::log(const LOG_TYPE &type, const std::string& massage) {
+void DebugLogger::log(const LOG_TYPE &type, const std::string& message) {
 
 	std::chrono::system_clock::time_point today = std::chrono::system_clock::now();
 	std::time_t tt;
@@ -96,18 +97,47 @@ void DebugLogger::log(const LOG_TYPE &type, const std::string& massage) {
 	//remove the endline character from the time string
 	time.erase(std::remove(time.begin(), time.end(), '\n'), time.end());
 	//let the logadapter write the whole string
-	logAdapter.write("[" + time + "] " + "[" + ToString(type) + "] " + ": " + massage);
+	logAdapter.write("[" + time + "] " + "[" + ToString(type) + "] " + ": " + message);
 }
 
-TelemetryLogger::TelemetryLogger(LogAdapter& logAdapter, const std::string r, const std::string m):
+TelemetryLogger::TelemetryLogger(LogAdapter& logAdapter, const std::string r, SharedObject<r2d2::SaveLoadMap>& map):
 	r(r),
-	m(m),
-	Logger(logAdapter)
+	map(map),
+	Logger(logAdapter),
+	running(false)
 {}
 
 
+
+
 //not functional yet
-void* TelemetryLogger::Log(void*) {
+
+void TelemetryLogger::start(){
+	running = true;
+	pthread_create(&threadId, NULL, TelemetryLogger::RUN, static_cast<void*>(this));
+	pthread_detach(threadId);
+}
+
+void TelemetryLogger::stop(){
+	running = false;
+	pthread_kill(threadId, 0);
+}
+
+bool TelemetryLogger::isRunning(){
+	return running;	
+}
+
+void* TelemetryLogger::RUN(void* p)
+	{
+		TelemetryLogger* context = static_cast<TelemetryLogger*>(p);
+		while(context->isRunning()) {
+			context->Log();
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		}
+		return NULL;
+	}
+
+void TelemetryLogger::Log() {
 	
 	std::chrono::system_clock::time_point today = std::chrono::system_clock::now();
 
@@ -115,14 +145,14 @@ void* TelemetryLogger::Log(void*) {
 	tt = std::chrono::system_clock::to_time_t(today);
 	string time = ctime(&tt);
 	time.erase(std::remove(time.begin(), time.end(), '\n'), time.end());
-	logAdapter.write("[" + time + "]" + "Robotstatus: " + r + "Map: " + m);
+	logAdapter.write("[" + time + "]" + "Robotstatus: " + r);
 
 	
 	//map
 	string mapFileName = time + " map.log";
 	fs.open(mapFileName, std::fstream::in | std::fstream::out | std::fstream::app);
-	//r2d2::BoxMap bm{};
-    //bm.save(mapFileName);
+	SharedObject<r2d2::SaveLoadMap>::Accessor acc(map);
+	acc.access().save(mapFileName);
 	fs.close();
 	
 	
@@ -137,10 +167,4 @@ void* TelemetryLogger::Log(void*) {
 	req.tv_nsec = milisec * 1000000L;
 	nanosleep(&req, (struct timespec *)NULL);
 	*/
-}
-
-TelemetryLoggerTask::TelemetryLoggerTask(TelemetryLogger&){
-	//std::thread task(&TelemetryLogger::Log);
-	//pthread_t t1;
-	//pthread_create(&t1, NULL, &TelemetryLogger::Log, nullptr);
 }
