@@ -9,6 +9,10 @@ find_package (Threads)
 file(GLOB SOURCES "source/src/*.cpp" 
 		"source/include/*.hpp"
 		"../map/source/src/MapInterface.cpp" 
+		"../sensorInterfaces/source/include/CoordinateAttitude.hpp" 
+		"../sensorInterfaces/source/src/CoordinateAttitude.cpp" 		
+		"../pilot/source/include/RobotStatus.hpp" 
+		"../pilot/source/src/RobotStatus.cpp" 
 		"../map/source/include/MapInterface.hpp"
 		"../map/source/include/ArrayBoxMap.hpp"
 		"../map/source/src/ArrayBoxMap.cpp"
@@ -22,6 +26,8 @@ file(GLOB SOURCES "source/src/*.cpp"
 		"../adt/source/src/Translation.cpp")
 file(GLOB SOURCES_GTEST "source/src/*.cpp" "source/include/*.hpp" "test/*.cpp" "test/*.hpp"
 "../map/source/src/MapInterface.cpp" 
+		"../pilot/source/src/RobotStatus.cpp" 
+		"../map/source/include/MapInterface.hpp"
 		"../map/source/include/MapInterface.hpp"
 		"../map/source/include/ArrayBoxMap.hpp"
 		"../map/source/src/ArrayBoxMap.cpp"
@@ -36,6 +42,7 @@ file(GLOB SOURCES_GTEST "source/src/*.cpp" "source/include/*.hpp" "test/*.cpp" "
 list(REMOVE_ITEM SOURCES_GTEST ${CMAKE_CURRENT_SOURCE_DIR}/source/src/Main.cpp)
 
 include_directories(
+	../sensorInterfaces/source/include
 	../pilot/source/include
 	../map/source/include
    	../adt/source/include

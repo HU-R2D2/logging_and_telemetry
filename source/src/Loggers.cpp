@@ -43,6 +43,7 @@
 #include <ctime>
 #include <pthread.h>
 #include <time.h>
+
 #include <BoxMap.hpp>
 #include <SharedObject.hpp>
 using namespace std;
@@ -100,8 +101,8 @@ void DebugLogger::log(const LOG_TYPE &type, const std::string& message) {
 	logAdapter.write("[" + time + "] " + "[" + ToString(type) + "] " + ": " + message);
 }
 
-TelemetryLogger::TelemetryLogger(LogAdapter& logAdapter, const std::string r, SharedObject<r2d2::SaveLoadMap>& map):
-	r(r),
+TelemetryLogger::TelemetryLogger(LogAdapter& logAdapter, SharedObject<r2d2::RobotStatus>& robot, SharedObject<r2d2::SaveLoadMap>& map):
+	robot(robot),
 	map(map),
 	Logger(logAdapter),
 	running(false)
@@ -145,7 +146,7 @@ void TelemetryLogger::Log() {
 	tt = std::chrono::system_clock::to_time_t(today);
 	string time = ctime(&tt);
 	time.erase(std::remove(time.begin(), time.end(), '\n'), time.end());
-	logAdapter.write("[" + time + "]" + "Robotstatus: " + r);
+	
 
 	
 	//map
@@ -154,17 +155,32 @@ void TelemetryLogger::Log() {
 	SharedObject<r2d2::SaveLoadMap>::Accessor acc(map);
 	acc.access().save(mapFileName);
 	fs.close();
+	//robotstatus doesnt compile yet
+	//robotstatus
+	/*SharedObject<r2d2::RobotStatus>::Accessor acd(robot);
+	SharedObject<r2d2::Speed>::Accessor speed (acd.access().get_current_speed());
+	LockingSharedObject<CoordinateAttitude>::Accessor coordinate (acd.access().get_current_coordinate_attitude());
+
+	r2d2::Speed spee = speed.access();
+	CoordinateAttitude coor = coordinate.access();
+	//double speedo = spee/(1 * r2d2::Speed);
+	std::stringstream ss;
+	ss << "[" << time << "]" << "Robotstatus: speed: " << spee << "coordinate: " << CoordinateAttitude.get_coordinate().get_X();
+	logAdapter.write(ss.str());*/
 	
-	
-	//////everything under here, doesn't function yet, the architect is looking into it//////
-	
-	//std::this_thread::sleep_for(std::chrono::seconds(1));
-	
-	/*
-	int milisec = 1000; // length of time to sleep, in miliseconds
-	struct timespec req = {0};
-	req.tv_sec = 0;
-	req.tv_nsec = milisec * 1000000L;
-	nanosleep(&req, (struct timespec *)NULL);
-	*/
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
