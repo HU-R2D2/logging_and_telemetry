@@ -42,12 +42,8 @@
 #include <algorithm>
 #include <string>
 #include <fstream>
-#include <sstream>      // std::stringstream, std::stringbuf
-#include <CoordinateAttitude.hpp>
-#include <Length.hpp>
 #include <BoxMap.hpp>
 #include <DefaultBoxMap.hpp>
-#include <RobotStatus.hpp>
 #include <LockingSharedObject.hpp>
 
 //LogAdapter is an interface for writing strings
@@ -104,7 +100,7 @@ private:
 //Telemetry implementation of a Logger. Gather data and write it to the adapter. 
 class TelemetryLogger : Logger {
 public: 	
-	TelemetryLogger(LogAdapter& logAdapter, SharedObject<r2d2::RobotStatus>& robot, SharedObject<r2d2::SaveLoadMap>& map);
+	TelemetryLogger(LogAdapter& logAdapter, const std::string r, SharedObject<r2d2::SaveLoadMap>& map);
 	void start();
 	void stop();
 	bool isRunning();
@@ -118,8 +114,8 @@ private:
 	pthread_t threadId;
 	bool running;
 	SharedObject<r2d2::SaveLoadMap>& map;
-	SharedObject<r2d2::RobotStatus>& robot;
 	std::fstream fs;
+	const std::string r;
 	
 };
 

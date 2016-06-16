@@ -51,14 +51,7 @@ int main() {
 	LockingSharedObject<r2d2::SaveLoadMap> ding(bm);
 	FileLogAdapter fla1("telemetry.log");
 	
-	CoordinateAttitude status = {r2d2::Coordinate(0 * r2d2::Length::METER,
-        0 * r2d2::Length::METER, 0 * r2d2::Length::METER), Attitude()};
-
-	r2d2::Speed s = 0 * r2d2::Length::METER/r2d2::Duration::SECOND;
-
-	r2d2::RobotStatus robot_status(status, s);
-	LockingSharedObject<r2d2::RobotStatus> robot(robot_status)
-	TelemetryLogger tl(fla1, robot, ding );
+	TelemetryLogger tl(fla1, "mooi", ding );
 	tl.start();
 	std::this_thread::sleep_for(std::chrono::seconds(10));
 	tl.stop();
